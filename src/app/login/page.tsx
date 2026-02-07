@@ -29,12 +29,13 @@ export default function LoginPage() {
             });
 
             if (result?.error) {
-                if (result.error.includes('USER_NOT_FOUND')) {
+                // NextAuth v5 可能把错误包装在特定的字符串里
+                if (result.error.includes('USER_NOT_FOUND') || result.error.includes('Read more at')) {
                     setError('该账号不存在，请先注册');
                 } else if (result.error.includes('INVALID_PASSWORD')) {
                     setError('密码错误');
                 } else {
-                    setError('登录失败，请稍后再试');
+                    setError('登录失败：' + result.error);
                 }
                 setLoading(false);
             } else {
