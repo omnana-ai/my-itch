@@ -45,23 +45,25 @@ export default function Navbar() {
                         </div>
 
                         {session ? (
-                            <div className="flex items-center gap-3">
-                                <span className="text-sm font-medium text-gray-700">
-                                    {session.user?.name || session.user?.email}
-                                </span>
-                                <button
-                                    onClick={() => signOut()}
-                                    className="p-2 text-gray-500 hover:text-rose-600 transition-colors"
-                                    title="退出登录"
-                                >
-                                    <LogOut className="h-5 w-5" />
-                                </button>
-                                <div className="h-8 w-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold border border-rose-200">
-                                    {session.user?.image ? (
-                                        <img src={session.user.image} alt="Avatar" className="h-8 w-8 rounded-full" />
-                                    ) : (
-                                        <User className="h-4 w-4" />
-                                    )}
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-sm font-medium text-gray-700">
+                                        {session.user?.name || session.user?.email}
+                                    </span>
+                                    <button
+                                        onClick={() => signOut()}
+                                        className="p-2 text-gray-500 hover:text-rose-600 transition-colors"
+                                        title="退出登录"
+                                    >
+                                        <LogOut className="h-5 w-5" />
+                                    </button>
+                                    <div className="h-8 w-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold border border-rose-200 overflow-hidden">
+                                        {session.user?.image ? (
+                                            <img src={session.user.image} alt="Avatar" className="h-full w-full object-cover" />
+                                        ) : (
+                                            <User className="h-4 w-4" />
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         ) : (
@@ -104,9 +106,14 @@ export default function Navbar() {
                         </div>
                         <div className="mt-4 flex flex-col gap-2 px-3 pb-3">
                             {session ? (
-                                <button onClick={() => signOut()} className="text-gray-600 hover:text-rose-500 block text-center py-2 border border-gray-200 rounded-md">
-                                    退出登录
-                                </button>
+                                <>
+                                    <Link href="/dashboard/games/new" className="bg-rose-600 text-white block text-center py-2 rounded-md hover:bg-rose-700">
+                                        上传游戏
+                                    </Link>
+                                    <button onClick={() => signOut()} className="text-gray-600 hover:text-rose-500 block text-center py-2 border border-gray-200 rounded-md">
+                                        退出登录
+                                    </button>
+                                </>
                             ) : (
                                 <>
                                     <Link href="/login" className="text-gray-600 hover:text-rose-500 block text-center py-2 border border-gray-200 rounded-md">登录</Link>

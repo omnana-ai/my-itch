@@ -89,10 +89,10 @@ export default function Home() {
             独立游戏爱好者的聚集地。托管你的游戏，参加 Game Jams，发现下一个爆款神作。
           </p>
           <div className="flex justify-center gap-4">
-            <Link href="/browse" className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-8 rounded-full transition-all shadow-lg hover:shadow-rose-500/25 transform hover:-translate-y-1">
+            <Link href="/games" className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-8 rounded-full transition-all shadow-lg hover:shadow-rose-500/25 transform hover:-translate-y-1">
               浏览游戏
             </Link>
-            <Link href="/upload" className="bg-white hover:bg-gray-50 text-gray-900 font-bold py-3 px-8 rounded-full border border-gray-200 transition-all hover:border-gray-300 shadow-sm">
+            <Link href="/dashboard/games/new" className="bg-white hover:bg-gray-50 text-gray-900 font-bold py-3 px-8 rounded-full border border-gray-200 transition-all hover:border-gray-300 shadow-sm transition-all hover:-translate-y-1">
               上传你的游戏
             </Link>
           </div>

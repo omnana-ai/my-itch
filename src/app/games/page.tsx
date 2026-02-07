@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import GameCard, { GameProps } from '@/components/ui/GameCard';
 import { Filter, ChevronDown, Search } from 'lucide-react';
 
@@ -103,20 +103,45 @@ const FILTERS = {
 };
 
 export default function GamesPage() {
+    const [games, setGames] = useState<GameProps[]>([]);
+    const [loading, setLoading] = useState(true);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Simple client-side filtering logic for demo
-    const filteredGames = ALL_GAMES.filter(game => {
-        // Search Filter
+    // 从 API 获取真实数据
+    useEffect(() => {
+        async function fetchGames() {
+            try {
+                const res = await fetch('/api/games');
+                if (res.ok) {
+                    const data = await res.json();
+                    // 适配数据格式 (Prisma 返回的 price 是数字, GameProps 需要字符串显示)
+                    const formattedGames = data.map((g: any) => ({
+                        ...g,
+                        price: g.price.toString(),
+                        author: g.author?.name || '未知作者',
+                        rating: 5.0, // 暂时硬编码评分，之后加评价系统
+                        platform: ['web', 'windows'], // 暂时硬编码
+                        tags: g.tags?.map((t: any) => t.name) || ['独立'],
+                        imageUrl: g.coverUrl || 'https://placehold.co/600x400/333/FFF?text=No+Cover'
+                    }));
+                    setGames(formattedGames);
+                }
+            } catch (err) {
+                console.error("Fetch error:", err);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchGames();
+    }, []);
+
+    const filteredGames = games.filter(game => {
         if (searchQuery && !game.title.toLowerCase().includes(searchQuery.toLowerCase())) {
             return false;
         }
-        // Tag Filter (OR logic for now)
         if (selectedTags.length > 0) {
-            const hasTag = game.tags.some(tag => selectedTags.includes(tag));
-            // Platform checking as tag for simplicity of demo if needed, but keeping separate.
-            return hasTag;
+            return game.tags.some(tag => selectedTags.includes(tag));
         }
         return true;
     });
