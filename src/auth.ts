@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 import Credentials from "next-auth/providers/credentials"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-    secret: "my-super-secret-key-for-development",
+    secret: process.env.AUTH_SECRET || "my-super-secret-key-for-development",
     adapter: PrismaAdapter(prisma),
     providers: [
         Credentials({
