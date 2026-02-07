@@ -1,0 +1,136 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// User model for Auth.js and profile info
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // For email/password auth
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  games         Game[]
+  comments      Comment[]
+  purchases     Purchase[]
+}
+
+// NextAuth specific models
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String? 
+  access_token       String? 
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? 
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Business Logic Models
+
+model Game {
+  id          String    @id @default(cuid())
+  title       String
+  description String    // Markdown content
+  price       Decimal   @default(0)
+  coverUrl    String?
+  
+  published   Boolean   @default(false)
+  views       Int       @default(0)
+  
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  
+  tags        Tag[]
+  builds      Build[]
+  comments    Comment[]
+  purchases   Purchase[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Build {
+  id          String   @id @default(cuid())
+  version     String   // e.g. "v1.0.0"
+  platform    String   // "windows", "mac", "linux", "web"
+  fileKey     String   // COS Object Key
+  fileSize    Int      // Bytes
+  
+  gameId      String
+  game        Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  rating    Int?     // 1-5 stars
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id])
+  
+  createdAt DateTime @default(now())
+}
+
+model Purchase {
+  id        String   @id @default(cuid())
+  amount    Decimal
+  status    String   // "completed", "pending"
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id])
+  
+  createdAt DateTime @default(now())
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  games Game[]
+}

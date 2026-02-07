@@ -1,12 +1,13 @@
 # Technical Design Document - My-Itch
 
-## 1. Technology Stack
+## 1. Technology Stack - CN Optimized
 - **Frontend**: Next.js 14+ (App Router), React, TailwindCSS.
-- **Backend**: Next.js API Routes (Serverless functions).
-- **Database**: Supabase (PostgreSQL) or Local SQLite for dev.
-- **Storage**: Supabase Storage or AWS S3 (for game files).
-- **Authentication**: NextAuth.js (Auth.js) or Supabase Auth.
-- **Deployment**: Vercel.
+- **Backend**: Next.js Server Actions.
+- **Database**: Tencent Cloud PostgreSQL (or MySQL).
+- **ORM**: Prisma (Type-safe database client).
+- **Storage**: Tencent Cloud COS (Object Storage) + CDN.
+- **Authentication**: Auth.js (NextAuth) - Email/Password, optionally WeChat/GitHub.
+- **Deployment**: Tencent Cloud Webify or CVM (Docker).
 
 ## 2. Architecture
 ### 2.1 Monorepo Structure
@@ -18,15 +19,19 @@ We will use a standard Next.js project structure:
   /games/[id]/     # Game details
   /dashboard/      # Developer tools
 /components        # Shared UI components
-/lib               # Utilities, DB clients
+/lib
+  /prisma.ts       # DB Client
+  /cos.ts          # Tencent Cloud Storage Client
+/prisma
+  schema.prisma    # Database Schema
 /public            # Static assets
 ```
 
-### 2.2 Database Schema (Draft)
-- **Users**: id, username, email, role, avatar_url.
-- **Games**: id, developer_id, title, description, price, tags, status.
-- **Builds**: id, game_id, file_path, version, platform.
-- **Comments**: id, user_id, game_id, content, created_at.
+### 2.2 Database Schema (Prisma Draft)
+- **User**: id, email, password_hash, name, avatar_url.
+- **Game**: id, authorId, title, description, price, published.
+- **Build**: id, gameId, file_key (COS key), version, platform.
+- **Comment**: id, userId, gameId, content.
 
 ## 3. Key Technical Challenges
 - **Large File Uploads**: Need chunked uploads for game builds.
