@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, Menu, Gamepad2 } from 'lucide-react';
+import { Search, Menu, Gamepad2, User, LogOut } from 'lucide-react';
 import { useState } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { data: session } = useSession();
 
     return (
         <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
@@ -42,12 +44,34 @@ export default function Navbar() {
                             />
                         </div>
 
-                        <div className="flex items-center gap-3">
-                            <Link href="/login" className="text-gray-600 hover:text-rose-500 font-medium text-sm">登录</Link>
-                            <Link href="/register" className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-all shadow-md hover:shadow-lg shadow-rose-200">
-                                注册
-                            </Link>
-                        </div>
+                        {session ? (
+                            <div className="flex items-center gap-3">
+                                <span className="text-sm font-medium text-gray-700">
+                                    {session.user?.name || session.user?.email}
+                                </span>
+                                <button
+                                    onClick={() => signOut()}
+                                    className="p-2 text-gray-500 hover:text-rose-600 transition-colors"
+                                    title="退出登录"
+                                >
+                                    <LogOut className="h-5 w-5" />
+                                </button>
+                                <div className="h-8 w-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold border border-rose-200">
+                                    {session.user?.image ? (
+                                        <img src={session.user.image} alt="Avatar" className="h-8 w-8 rounded-full" />
+                                    ) : (
+                                        <User className="h-4 w-4" />
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-3">
+                                <Link href="/login" className="text-gray-600 hover:text-rose-500 font-medium text-sm">登录</Link>
+                                <Link href="/register" className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-all shadow-md hover:shadow-lg shadow-rose-200">
+                                    注册
+                                </Link>
+                            </div>
+                        )}
                     </div>
 
                     {/* Mobile menu button */}
@@ -79,8 +103,16 @@ export default function Navbar() {
                             />
                         </div>
                         <div className="mt-4 flex flex-col gap-2 px-3 pb-3">
-                            <Link href="/login" className="text-gray-600 hover:text-rose-500 block text-center py-2 border border-gray-200 rounded-md">登录</Link>
-                            <Link href="/register" className="bg-rose-600 text-white block text-center py-2 rounded-md hover:bg-rose-700">注册</Link>
+                            {session ? (
+                                <button onClick={() => signOut()} className="text-gray-600 hover:text-rose-500 block text-center py-2 border border-gray-200 rounded-md">
+                                    退出登录
+                                </button>
+                            ) : (
+                                <>
+                                    <Link href="/login" className="text-gray-600 hover:text-rose-500 block text-center py-2 border border-gray-200 rounded-md">登录</Link>
+                                    <Link href="/register" className="bg-rose-600 text-white block text-center py-2 rounded-md hover:bg-rose-700">注册</Link>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

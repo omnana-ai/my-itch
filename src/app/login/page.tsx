@@ -1,9 +1,52 @@
 'use client';
 
 import Link from 'next/link';
-import { Gamepad2, Mail, Lock, ArrowRight, Github } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { Gamepad2, Mail, Lock, ArrowRight, Github, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
+    const router = useRouter();
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        const formData = new FormData(e.currentTarget);
+        const email = formData.get('email') as string;
+        const password = formData.get('password') as string;
+
+        try {
+            const result = await signIn('credentials', {
+                email,
+                password,
+                isRegister: 'false',
+                redirect: false,
+            });
+
+            if (result?.error) {
+                if (result.error.includes('USER_NOT_FOUND')) {
+                    setError('该账号不存在，请先注册');
+                } else if (result.error.includes('INVALID_PASSWORD')) {
+                    setError('密码错误');
+                } else {
+                    setError('登录失败，请稍后再试');
+                }
+                setLoading(false);
+            } else {
+                router.push('/');
+                router.refresh();
+            }
+        } catch (err) {
+            setError('发生错误，请稍后再试');
+            setLoading(false);
+        }
+    }
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
@@ -18,7 +61,13 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                <form className="mt-8 space-y-6" action="#" method="POST">
+                {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                        {error}
+                    </div>
+                )}
+
+                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="rounded-md shadow-sm space-y-4">
                         <div>
                             <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-1">
@@ -83,12 +132,17 @@ export default function LoginPage() {
                     <div>
                         <button
                             type="submit"
-                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition-all shadow-md hover:shadow-lg hover:shadow-rose-100"
+                            disabled={loading}
+                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition-all shadow-md hover:shadow-lg hover:shadow-rose-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                                <ArrowRight className="h-5 w-5 text-rose-500 group-hover:text-rose-400" aria-hidden="true" />
+                                {loading ? (
+                                    <Loader2 className="h-5 w-5 text-rose-400 animate-spin" />
+                                ) : (
+                                    <ArrowRight className="h-5 w-5 text-rose-500 group-hover:text-rose-400" aria-hidden="true" />
+                                )}
                             </span>
-                            登录
+                            {loading ? '登录中...' : '登录'}
                         </button>
                     </div>
                 </form>
