@@ -151,7 +151,7 @@ export default function GameDetailPage() {
                         <div className="bg-white p-8 rounded-3xl shadow-xl border border-rose-100 sticky top-24">
                             <div className="text-center mb-8">
                                 <span className="text-5xl font-black text-gray-900">
-                                    {game.price === 0 ? '免费' : `$${game.price.toFixed(2)}`}
+                                    {Number(game.price) === 0 ? '免费' : `$${Number(game.price).toFixed(2)}`}
                                 </span>
                                 <p className="text-sm text-gray-500 mt-2">支持开发者继续创作</p>
                             </div>

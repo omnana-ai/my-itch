@@ -118,7 +118,7 @@ export default function GamesPage() {
                     // 适配数据格式 (Prisma 返回的 price 是数字, GameProps 需要字符串显示)
                     const formattedGames = data.map((g: any) => ({
                         ...g,
-                        price: g.price.toString(),
+                        price: Number(g.price).toString(),
                         author: g.author?.name || '未知作者',
                         rating: 5.0, // 暂时硬编码评分，之后加评价系统
                         platform: ['web', 'windows'], // 暂时硬编码
